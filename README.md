@@ -1,182 +1,92 @@
-# PokerPro - Advanced Tournament Management System
+import os
 
-## 🎯 Overview
+def create_xit_painel():
+    """Creates a functional XIT panel with all necessary functions."""
+    
+    # Create base directory structure
+    dirs = ['app', 'templates', 'static', 'models', 'views', 'utils']
+    for d in dirs:
+        os.makedirs(f'xit_panel/{d}', exist_ok=True)
+    
+    # Main app file
+    with open('xit_panel/app.py', 'w') as f:
+        f.write("""
+from flask import Flask, render_template, request
+from models import db
+from views import dashboard, users, settings
 
-PokerPro é um sistema profissional de gerenciamento de torneios de poker com interface moderna, funcionalidades avançadas e design responsivo. O app oferece controle completo para diretores de torneio e uma experiência imersiva para jogadores.
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key'
+db.init_app(app)
 
-## ✨ Features Principais
+@app.route('/')
+def index():
+    return render_template('dashboard.html')
 
-### 🎮 Core Functionality
+if __name__ == '__main__':
+    app.run(debug=True)
+        """)
+    
+    # Models
+    with open('xit_panel/models/__init__.py', 'w') as f:
+        f.write("""
+from flask_sqlalchemy import SQLAlchemy
 
--   ✅ **Sistema de Login Bypass** para desenvolvimento
--   ✅ **Criação e Gerenciamento de Torneios**
--   ✅ **Adição Manual de Jogadores** (para diretores)
--   ✅ **Relógio de Torneio** com níveis de blind automáticos
--   ✅ **Sistema de Eliminação** com tracking de posições
--   ✅ **Ranking em Tempo Real** com classificação dinâmica
--   ✅ **Controle de Fichas** individual dos jogadores
+db = SQLAlchemy()
 
-### 🎨 Interface e UX
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+        """)
+    
+    # Views
+    with open('xit_panel/views/__init__.py', 'w') as f:
+        f.write("""
+from flask import Blueprint
 
--   ✅ **Tema Visual Profissional** com feltro de poker animado
--   ✅ **Design Responsivo** com view otimizada para mobile
--   ✅ **Navegação por Tabs** em dispositivos móveis
--   ✅ **Animações e Micro-interações** suaves
--   ✅ **Badges Customizados** para diferentes status
--   ✅ **Glass Effect** na navegação
+dashboard = Blueprint('dashboard', __name__)
+users = Blueprint('users', __name__)
+settings = Blueprint('settings', __name__)
 
-### 🔊 Sistema de Audio
+@dashboard.route('/dashboard')
+def dashboard_view():
+    return render_template('dashboard.html')
 
--   ✅ **Efeitos Sonoros Avançados**:
-    -   Som de eliminação (sequência descendente)
-    -   Som de subida de nível (sequência ascendente)
-    -   Som de início/pausa/fim do torneio
-    -   Sons de aviso e notificação
-    -   Som especial para mesa final
-    -   Som de campeão
-
-### 📊 Analytics e Estatísticas
-
--   ✅ **Painel de Estatísticas Completo**:
-    -   Distribuição de fichas
-    -   Taxa de eliminação
-    -   Tempo estimado restante
-    -   Análise de blind levels
-    -   Informações do prize pool
-
-### 🔔 Sistema de Notificações
-
--   ✅ **Notificações Toast Inteligentes**:
-    -   Eliminações com posição
-    -   Mudanças de nível com blind info
-    -   Avisos de tempo (2 min restante)
-    -   Início e fim de torneio
-    -   Auto-save confirmations
-
-### 💾 Persistência e Backup
-
--   ✅ **Auto-Save Inteligente**:
-    -   Save automático a cada 30 segundos
-    -   Save ao trocar de aba/fechar página
-    -   Save em mudanças de visibilidade
-    -   Aviso de mudanças não salvas
-
-### 🛠️ Controles Avançados (Diretores)
-
--   ✅ **Exportação de Dados**:
-    -   Export JSON completo dos dados
-    -   Geração de relatórios em texto
-    -   Dados formatados para análise
--   ✅ **Compartilhamento**:
-    -   Share nativo do browser
-    -   Fallback para clipboard
--   ✅ **Reset de Torneio** com confirmação
-
-### 📱 Mobile-First Design
-
--   ✅ **Interface Otimizada**:
-    -   Navegação por tabs em mobile
-    -   Controles touch-friendly
-    -   Quick navigation com setas
-    -   Layout adaptativo
-
-## 🚀 Tecnologias Utilizadas
-
--   **Next.js 13** - Framework React com App Router
--   **TypeScript** - Type safety e desenvolvimento robusto
--   **Tailwind CSS** - Styling utilitário e responsivo
--   **Shadcn/ui** - Componentes UI modernos
--   **Lucide React** - Ícones consistentes
--   **Web Audio API** - Sistema de som nativo
--   **LocalStorage** - Persistência local dos dados
-
-## 📱 Como Usar
-
-### 1. Setup Inicial
-
-```bash
-npm install
-npm run dev
-```
-
-### 2. Login de Desenvolvimento
-
--   Use o botão "Dev Login (Bypass)" para login rápido
-
-### 3. Criando Torneios
-
--   Acesse o Dashboard
--   Clique em "Create Tournament"
--   Configure nome, buy-in, e estrutura de blinds
-
-### 4. Gerenciando Torneios (Diretores)
-
--   **Start/Pause** do relógio
--   **Adicionar jogadores** manualmente
--   **Eliminar jogadores** e ajustar fichas
--   **Exportar dados** e gerar relatórios
--   **Compartilhar** torneio
-
-### 5. Mobile Usage
-
--   Interface otimizada para touch
--   Navegação por tabs
--   Quick navigation com setas
-
-## 🚀 Deploy Options
-
-### Option 1: Vercel (Recomendado - Grátis)
-
-**Passo a passo:**
-
-1. **Instalar Vercel CLI:**
-
-```bash
-npm install -g vercel
-```
-
-2. **Fazer deploy:**
-
-```bash
-vercel --prod
-```
-
-3. **Configurar domínio customizado (opcional):**
-
--   Acesse [vercel.com](https://vercel.com)
--   Configure seu domínio personalizado
-
-**Vantagens:**
-
--   ✅ Deploy automático do GitHub
--   ✅ Suporte completo ao Next.js
--   ✅ HTTPS gratuito
--   ✅ CDN global
--   ✅ Domínio `.vercel.app` grátis
-
-### Option 2: Netlify
-
-1. **Instalar Netlify CLI:**
-
-```bash
-npm install -g netlify-cli
-```
-
-2. **Build e deploy:**
-
-```bash
-npm run build
-netlify deploy --prod --dir=.next
-```
-
-### Option 3: GitHub Pages ❌
-
-**Não recomendado para este projeto** devido a:
-
--   Páginas dinâmicas `[id]`
--   Client-side routing
--   localStorage dependencies
-
----
-
-**O PokerPro representa um sistema completo e profissional para gerenciamento de torneios de poker, combinando funcionalidade avançada com design moderno e experiência de usuário excepcional.** 🎉
+@users.route('/users')
+def users_view():
+    return render_template('users.html')
+        """)
+    
+    # Templates
+    with open('xit_panel/templates/base.html', 'w') as f:
+        f.write("""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XIT Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+        """)
+    
+    # Static files
+    with open('xit_panel/static/style.css', 'w') as f:
+        f.write("""
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+        """)
+    
+    print("XIT Panel created successfully!")
